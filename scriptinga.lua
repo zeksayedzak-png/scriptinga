@@ -1,353 +1,300 @@
--- 🔧 ADVANCED SYSTEM OPTIMIZER v4.1 (COMPLETE)
+-- ⚡ STEALTH PERFORMANCE BOOSTER v5.0
 -- loadstring(game:HttpGet(""))()
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
 local localPlayer = Players.LocalPlayer
 
 -- ============================================
--- 🧠 INTELLIGENT CONTROL SYSTEM
+-- 🧠 ADAPTIVE INTELLIGENCE SYSTEM
 -- ============================================
-local Optimizer = {
-    _session = "OPT_" .. os.time(),
+local StealthCore = {
+    _session = "SC_" .. os.time(),
     _active = false,
-    _speed = 1.2,
-    _failCount = 0,
-    _currentTarget = nil,
+    _target = nil,
+    _mode = "safe", -- safe, normal, aggressive
+    _cycle = 0,
     
-    ThreatDetector = {
-        lastKickTime = 0,
-        suspiciousEvents = 0,
+    -- أذكى نظام سرعة
+    SpeedManager = {
+        baseDelay = 0.8,
+        currentMultiplier = 1.0,
         
-        checkEnvironment = function(self)
-            local redFlags = 0
+        calculateDelay = function(self)
+            -- تحليل كثافة الشبكة
+            local networkLoad = #ReplicatedStorage:GetChildren() / 100
+            local playerCount = #Players:GetPlayers()
             
-            for _, script in pairs(game:GetDescendants()) do
-                if script:IsA("Script") then
-                    local name = script.Name:lower()
-                    if name:find("cheat") or name:find("scan") or name:find("detect") then
-                        redFlags = redFlags + 1
-                    end
-                end
+            -- صيغة ذكية
+            local delay = self.baseDelay * self.currentMultiplier
+            delay = delay * (1 + (networkLoad * 0.1))
+            delay = math.max(0.3, math.min(delay, 3.0))
+            
+            return delay + (math.random() * 0.2) -- عشوائية إضافية
+        end,
+        
+        adjustBasedOnResponse = function(self, successRate)
+            if successRate > 0.7 then
+                self.currentMultiplier = math.max(0.7, self.currentMultiplier * 0.95)
+            elseif successRate < 0.3 then
+                self.currentMultiplier = math.min(1.5, self.currentMultiplier * 1.1)
             end
-            
-            if #game:GetService("NetworkClient"):GetChildren() > 50 then
-                redFlags = redFlags + 1
-            end
-            
-            return redFlags
         end
     },
     
-    SpeedController = {
-        adjustBasedOnRisk = function(self, riskLevel)
-            if riskLevel > 2 then return 3.0
-            elseif riskLevel > 0 then return 2.0
-            else return 0.8 end
+    -- نظام اكتشاف التهديدات المخفي
+    ThreatSensor = {
+        _lastCheck = 0,
+        
+        stealthCheck = function(self)
+            -- فحص غير مباشر
+            local riskScore = 0
+            
+            -- 1. فحص غير واضح
+            pcall(function()
+                -- تحقق من أداء النظام (يبدو شرعياً)
+                local mem = game:GetService("Stats"):GetTotalMemoryUsageMb()
+                if mem > 500 then riskScore = riskScore + 1 end
+            end)
+            
+            -- 2. مراقبة غير مباشرة للاعبين
+            if #Players:GetPlayers() < 2 then
+                riskScore = riskScore + 1 -- سرير عالي الخطورة
+            end
+            
+            return riskScore
         end
     }
 }
 
 -- ============================================
--- 🔄 SMART EXECUTION ENGINE
+-- ⚡ HYPER-OPTIMIZED EXECUTION
 -- ============================================
-function Optimizer:executeSmartOperation()
-    if not self._currentTarget then return {} end
-    if self._active then return {} end
+function StealthCore:executeOperation()
+    if not self._target or self._active then return 0 end
     
     self._active = true
-    local results = {}
-    local targetId = self._currentTarget
-    local riskLevel = self.ThreatDetector:checkEnvironment()
+    self._cycle = self._cycle + 1
+    local successCount = 0
+    local attemptCount = 0
     
-    self._speed = self.SpeedController:adjustBasedOnRisk(riskLevel)
-    
-    local prioritizedRemotes = {}
-    
+    -- جمع الريموتس المهمة فقط (ليس كلها)
+    local criticalRemotes = {}
     for _, remote in pairs(ReplicatedStorage:GetDescendants()) do
         if remote:IsA("RemoteEvent") then
-            local priority = 1
             local name = remote.Name:lower()
-            
-            if name:find("item") or name:find("give") then priority = 2 end
-            if name:find("gamepass") or name:find("purchase") then priority = 3 end
-            
-            table.insert(prioritizedRemotes, {
-                object = remote,
-                priority = priority,
-                name = name
-            })
+            -- فلترة ذكية
+            if not (name:find("chat") or name:find("gui") or name:find("animate")) then
+                table.insert(criticalRemotes, remote)
+            end
         end
     end
     
-    table.sort(prioritizedRemotes, function(a, b)
-        return a.priority > b.priority
-    end)
-    
-    for _, remoteInfo in ipairs(prioritizedRemotes) do
+    -- 🔥 التنفيذ المتوازن: سريع لكن غير مكشوف
+    for i, remote in ipairs(criticalRemotes) do
         if not self._active then break end
         
-        wait(self._speed + math.random() * 0.5)
+        -- توقيت ذكي غير نمطي
+        local currentDelay = self.SpeedManager:calculateDelay()
         
-        local payloads = {
-            {id = targetId, sync = true},
-            targetId,
-            {resource = targetId}
-        }
+        -- تغيير النمط كل 5 دورات
+        if self._cycle % 5 == 0 then
+            currentDelay = currentDelay * (0.8 + (math.random() * 0.4))
+        end
+        
+        wait(currentDelay)
+        
+        -- payloads مختلفة في كل دورة
+        local payloads
+        if self._cycle % 3 == 0 then
+            payloads = {{id = self._target}}
+        elseif self._cycle % 3 == 1 then
+            payloads = {self._target, {resource = self._target}}
+        else
+            payloads = {{key = self._target}, {item = self._target}}
+        end
         
         for _, payload in ipairs(payloads) do
             if not self._active then break end
             
+            attemptCount = attemptCount + 1
+            
             local success = pcall(function()
-                remoteInfo.object:FireServer(payload)
+                remote:FireServer(payload)
                 return true
             end)
             
             if success then
-                table.insert(results, "✓ " .. remoteInfo.name)
-                break
-            else
-                self._failCount = self._failCount + 1
-                if self._failCount > 5 then
-                    self._active = false
-                    return results
-                end
+                successCount = successCount + 1
+                break -- نجاح → انتقل للريموت التالي
             end
+        end
+        
+        -- توقف ذكي إذا كثرة الفشل
+        if attemptCount > 20 and successCount < 2 then
+            break
         end
     end
     
-    self._active = false
-    return results
-end
-
--- ============================================
--- 🔄 AUTO-RESTART SYSTEM
--- ============================================
-function Optimizer:startPersistentOperation(targetId)
-    self._currentTarget = targetId
+    -- تحديث نظام السرعة
+    local successRate = attemptCount > 0 and (successCount / attemptCount) or 0
+    self.SpeedManager:adjustBasedOnResponse(successRate)
     
-    spawn(function()
-        local cycle = 0
-        
-        while self._currentTarget do
-            cycle = cycle + 1
-            
-            local results = self:executeSmartOperation()
-            
-            if #results > 0 then
-                print("✅ Cycle " .. cycle .. ": " .. #results .. " ops")
-            end
-            
-            local waitTime = math.random(30, 180)
-            wait(waitTime)
-            
-            self._speed = math.random(8, 15) / 10
-        end
-    end)
-end
-
-function Optimizer:stopOperation()
-    self._currentTarget = nil
     self._active = false
-    print("⏹️ Operation stopped")
+    return successCount
 end
 
 -- ============================================
--- 🖥️ STEALTH INTERFACE WITH HIDDEN INPUT
+-- 📱 ULTRA-STEALTH MOBILE INTERFACE
 -- ============================================
-local function createStealthUI()
-    if localPlayer.PlayerGui:FindFirstChild("SystemMonitor") then
-        localPlayer.PlayerGui.SystemMonitor:Destroy()
+local function createUltraStealthUI()
+    if localPlayer.PlayerGui:FindFirstChild("PerfOverlay") then
+        localPlayer.PlayerGui.PerfOverlay:Destroy()
     end
     
     local gui = Instance.new("ScreenGui")
-    gui.Name = "SystemMonitor"
+    gui.Name = "PerfOverlay"
     gui.ResetOnSpawn = false
     
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0, 250, 0, 120)
-    frame.Position = UDim2.new(1, -260, 0, 10)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 45, 50)
-    frame.BackgroundTransparency = 0.2
+    -- 🔥 واجهة مخفية تماماً
+    local overlay = Instance.new("Frame")
+    overlay.Size = UDim2.new(0.3, 0, 0.12, 0)
+    overlay.Position = UDim2.new(0.7, 0, 0.02, 0)
+    overlay.BackgroundColor3 = Color3.fromRGB(40, 45, 50)
+    overlay.BackgroundTransparency = 0.3
+    overlay.BorderSizePixel = 0
     
-    local title = Instance.new("TextLabel")
-    title.Text = "🖥️ System Monitor"
-    title.Size = UDim2.new(1, 0, 0, 25)
-    title.BackgroundColor3 = Color3.fromRGB(30, 35, 40)
-    title.TextColor3 = Color3.fromRGB(220, 220, 220)
-    title.Font = Enum.Font.SourceSans
-    title.TextSize = 14
-    
+    -- إحصائيات تبدو حقيقية
     local stats = Instance.new("TextLabel")
-    stats.Text = "FPS: 60\nRAM: 125MB\nCPU: 12%\nStatus: Idle"
-    stats.Size = UDim2.new(1, -10, 1, -30)
-    stats.Position = UDim2.new(0, 5, 0, 30)
+    stats.Text = "FPS: 60 | PING: 45"
+    stats.Size = UDim2.new(1, 0, 1, 0)
     stats.BackgroundTransparency = 1
     stats.TextColor3 = Color3.fromRGB(180, 180, 180)
-    stats.TextXAlignment = Enum.TextXAlignment.Left
     stats.Font = Enum.Font.SourceSans
     stats.TextSize = 12
+    stats.TextXAlignment = Enum.TextXAlignment.Right
     
-    -- 🔥 HIDDEN INPUT SYSTEM
-    local hiddenInput = Instance.new("TextBox")
-    hiddenInput.Name = "ConfigInput"
-    hiddenInput.Size = UDim2.new(0.7, 0, 0.15, 0)
-    hiddenInput.Position = UDim2.new(0.15, 0, 0.7, 0)
-    hiddenInput.BackgroundColor3 = Color3.fromRGB(50, 55, 60)
-    hiddenInput.TextColor3 = Color3.fromRGB(200, 200, 200)
-    hiddenInput.PlaceholderText = "Config code..."
-    hiddenInput.Text = ""
-    hiddenInput.Visible = false
-    hiddenInput.Font = Enum.Font.SourceSans
-    hiddenInput.TextSize = 11
-    hiddenInput.Parent = frame
+    -- 🔥 نظام التحكم المخفي (ضغط مطول)
+    local longPressStart = 0
+    local longPressActive = false
     
-    local hiddenButton = Instance.new("TextButton")
-    hiddenButton.Name = "ExecuteButton"
-    hiddenButton.Size = UDim2.new(0.2, 0, 0.15, 0)
-    hiddenButton.Position = UDim2.new(0.85, 0, 0.7, 0)
-    hiddenButton.BackgroundColor3 = Color3.fromRGB(60, 65, 70)
-    hiddenButton.Text = "⚙️"
-    hiddenButton.TextColor3 = Color3.fromRGB(200, 200, 200)
-    hiddenButton.Visible = false
-    hiddenButton.Font = Enum.Font.SourceSansBold
-    hiddenButton.TextSize = 12
-    hiddenButton.Parent = frame
-    
-    -- 🔥 ACTIVATION SYSTEM (Triple click)
-    local activationSequence = ""
-    local lastClickTime = 0
-    
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local currentTime = tick()
+    overlay.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            longPressStart = tick()
+            longPressActive = true
             
-            if currentTime - lastClickTime < 0.5 then
-                activationSequence = activationSequence .. "1"
+            task.spawn(function()
+                wait(1.5) -- ضغط لمدة 1.5 ثانية
+                if longPressActive then
+                    -- 🔥 تظهر لوحة التحكم المخفية
+                    createControlPanel()
+                    longPressActive = false
+                end
+            end)
+        end
+    end))
+    
+    overlay.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.Touch then
+            longPressActive = false
+        end
+    end)
+    
+    -- 🔥 تحديث الإحصائيات الذكي
+    task.spawn(function()
+        while gui.Parent do
+            wait(3.5) -- فترات غير منتظمة
+            
+            if StealthCore._target then
+                stats.Text = string.format("FPS: %d | PING: %d",
+                    math.random(58, 62),
+                    math.random(42, 48)
+                )
             else
-                activationSequence = ""
-            end
-            
-            lastClickTime = currentTime
-            
-            -- Triple click detection
-            if #activationSequence >= 3 then
-                hiddenInput.Visible = true
-                hiddenButton.Visible = true
-                hiddenInput:CaptureFocus()
-                activationSequence = ""
-                
-                -- Auto-hide after 30 seconds
-                task.spawn(function()
-                    wait(30)
-                    if hiddenInput.Visible then
-                        hiddenInput.Visible = false
-                        hiddenButton.Visible = false
-                        hiddenInput.Text = ""
-                    end
-                end)
+                stats.Text = string.format("FPS: %d | PING: %d",
+                    math.random(55, 65),
+                    math.random(40, 50)
+                )
             end
         end
     end)
     
-    -- 🔥 EXECUTION HANDLER
-    hiddenButton.MouseButton1Click:Connect(function()
-        local configText = hiddenInput.Text
-        local id = tonumber(configText)
+    stats.Parent = overlay
+    overlay.Parent = gui
+    gui.Parent = localPlayer.PlayerGui
+    
+    return gui
+end
+
+-- 🔥 لوحة التحكم المخفية
+local function createControlPanel()
+    if localPlayer.PlayerGui:FindFirstChild("ControlPanel") then
+        localPlayer.PlayerGui.ControlPanel:Destroy()
+    end
+    
+    local panel = Instance.new("Frame")
+    panel.Name = "ControlPanel"
+    panel.Size = UDim2.new(0.6, 0, 0.4, 0)
+    panel.Position = UDim2.new(0.2, 0, 0.3, 0)
+    panel.BackgroundColor3 = Color3.fromRGB(35, 40, 45)
+    panel.BackgroundTransparency = 0.1
+    
+    -- حقل إدخال
+    local input = Instance.new("TextBox")
+    input.PlaceholderText = "Enter configuration..."
+    input.Size = UDim2.new(0.8, 0, 0.15, 0)
+    input.Position = UDim2.new(0.1, 0, 0.1, 0)
+    
+    -- زر التنفيذ
+    local execBtn = Instance.new("TextButton")
+    execBtn.Text = "Apply"
+    execBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
+    execBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
+    
+    execBtn.MouseButton1Click:Connect(function()
+        local text = input.Text
+        local id = tonumber(text)
         
         if not id then
-            for num in configText:gmatch("%d+") do
+            for num in text:gmatch("%d+") do
                 id = tonumber(num)
-                if id and id > 100000 then
-                    break
-                end
+                if id and id > 1000 then break end
             end
         end
         
         if id then
-            hiddenInput.Visible = false
-            hiddenButton.Visible = false
-            hiddenInput.Text = ""
+            StealthCore._target = id
+            panel:Destroy()
             
-            -- Update UI
-            stats.Text = string.format(
-                "FPS: %d\nRAM: %dMB\nCPU: %d%%\nTask: %d",
-                math.random(55, 65),
-                math.random(120, 130),
-                math.random(10, 15),
-                id
-            )
-            
-            -- Start operation
-            Optimizer:startPersistentOperation(id)
-            print("🎯 Started operation for ID:", id)
-        else
-            hiddenInput.Text = "Invalid ID"
-            task.wait(1.5)
-            hiddenInput.Text = ""
-        end
-    end))
-    
-    -- 🔥 STOP BUTTON (Hidden)
-    local stopButton = Instance.new("TextButton")
-    stopButton.Name = "StopButton"
-    stopButton.Size = UDim2.new(0.3, 0, 0.15, 0)
-    stopButton.Position = UDim2.new(0.35, 0, 0.85, 0)
-    stopButton.BackgroundColor3 = Color3.fromRGB(80, 30, 30)
-    stopButton.Text = "⏹️"
-    stopButton.TextColor3 = Color3.new(1, 1, 1)
-    stopButton.Visible = false
-    stopButton.Font = Enum.Font.SourceSansBold
-    stopButton.Parent = frame
-    
-    stopButton.MouseButton1Click:Connect(function()
-        Optimizer:stopOperation()
-        stats.Text = "FPS: 60\nRAM: 125MB\nCPU: 12%\nStatus: Stopped"
-        stopButton.Visible = false
-    end)
-    
-    -- 🔥 DOUBLE CLICK FOR STOP BUTTON
-    local stopClickTime = 0
-    frame.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton2 then -- Right click
-            local currentTime = tick()
-            if currentTime - stopClickTime < 0.5 then
-                stopButton.Visible = not stopButton.Visible
-            end
-            stopClickTime = currentTime
+            -- بدء العملية
+            task.spawn(function()
+                while StealthCore._target do
+                    local results = StealthCore:executeOperation()
+                    if results > 0 then
+                        print("[CORE] Cycle completed:", results, "ops")
+                    end
+                    wait(math.random(25, 60)) -- فترات عشوائية
+                end
+            end)
         end
     end)
     
-    -- 🔥 STATS UPDATER
-    task.spawn(function()
-        while gui.Parent do
-            wait(3)
-            if Optimizer._currentTarget then
-                stats.Text = string.format(
-                    "FPS: %d\nRAM: %dMB\nCPU: %d%%\nActive: %d",
-                    math.random(55, 65),
-                    math.random(120, 130),
-                    math.random(10, 15),
-                    Optimizer._currentTarget
-                )
-            else
-                stats.Text = string.format(
-                    "FPS: %d\nRAM: %dMB\nCPU: %d%%\nStatus: Idle",
-                    math.random(55, 65),
-                    math.random(120, 130),
-                    math.random(10, 15)
-                )
-            end
-        end
+    -- زر الإغلاق
+    local closeBtn = Instance.new("TextButton")
+    closeBtn.Text = "Close"
+    closeBtn.Size = UDim2.new(0.8, 0, 0.15, 0)
+    closeBtn.Position = UDim2.new(0.1, 0, 0.5, 0)
+    
+    closeBtn.MouseButton1Click:Connect(function()
+        panel:Destroy()
     end)
     
-    stats.Parent = frame
-    title.Parent = frame
-    frame.Parent = gui
-    gui.Parent = localPlayer.PlayerGui
-    
-    print("✅ Stealth UI created")
-    return gui
+    -- التجميع
+    input.Parent = panel
+    execBtn.Parent = panel
+    closeBtn.Parent = panel
+    panel.Parent = localPlayer.PlayerGui
 end
 
 -- ============================================
@@ -355,26 +302,27 @@ end
 -- ============================================
 wait(2)
 
-createStealthUI()
+createUltraStealthUI()
 
 print("\n" .. string.rep("=", 50))
-print("🔧 ADVANCED SYSTEM OPTIMIZER v4.1")
-print("⚡ Triple-click to activate (frame)")
-print("🎯 Right-double-click for stop button")
-print("📱 Mobile compatible")
+print("⚡ STEALTH PERFORMANCE BOOSTER v5.0")
+print("📱 Mobile optimized | Loadstring ready")
+print("🎯 Long-press overlay for controls")
+print("⚙️ Adaptive intelligence system")
 print(string.rep("=", 50))
 
--- Export for console access
-_G.Optimizer = Optimizer
-_G.StartTask = function(id)
-    Optimizer:startPersistentOperation(id)
-    return "Started task: " .. id
+-- Export
+_G.StealthCore = StealthCore
+_G.Boost = function(id)
+    StealthCore._target = id
+    return "Target set: " .. id
 end
-_G.StopTask = function()
-    Optimizer:stopOperation()
-    return "Stopped"
+_G.Stop = function()
+    StealthCore._target = nil
+    return "Operation stopped"
 end
 
-print("\n✅ System ready!")
-print("Console commands: _G.StartTask(ID), _G.StopTask()")
-return "Optimizer v4.1 loaded successfully"
+print("\n✅ SYSTEM READY")
+print("• Long-press FPS display for controls")
+print("• Console: _G.Boost(ID) / _G.Stop()")
+return "Stealth Booster v5.0 activated"
